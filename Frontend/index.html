@@ -106,6 +106,13 @@
 				-175.220564477617, -41.2999878536917, 179.216647094029, 64.1500236197392
 			],
 		}
+		const newData = {
+			type: 'FeatureCollection',
+			features: [],
+			"bbox": [
+				-175.220564477617, -41.2999878536917, 179.216647094029, 64.1500236197392
+			],
+		}
 
 		const world = Globe({ animateIn: false })
 
@@ -119,12 +126,28 @@
 			.labelLng(d => d.properties.longitude)
 			.labelText(d => d.properties.name)
 			.labelSize(d => Math.sqrt(d.properties.pop_max) * 4e-4)
-			.labelDotRadius(d => Math.sqrt(d.properties.pop_max) * 4e-4)
-			.labelColor(() => 'rgba(255, 255, 0, 0.75)')
+			.labelDotRadius(d => d.new ? Math.sqrt(d.properties.pop_max) * 4e-4 : Math.sqrt(d.properties.pop_max) * 2e-4)
+			.labelColor((d) => d.new ? 'rgba(255, 255, 0, 0.75)' : 'rgba(255, 255, 255, 0.5)')
 			.labelResolution(10)
 			.labelAltitude(.03)
 			.globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
 			.bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png');
+
+
+		// (document.getElementById('globeViz'))
+
+
+		// 	.labelsData(newData.features)
+		// 	.labelLat(d => d.properties.latitude)
+		// 	.labelLng(d => d.properties.longitude)
+		// 	.labelText(d => d.properties.name)
+		// 	.labelSize(d => Math.sqrt(d.properties.pop_max) * 4e-4)
+		// 	.labelDotRadius(d => Math.sqrt(d.properties.pop_max) * 4e-4)
+		// 	.labelColor(() => 'rgba(255, 255, 0, 0.75)')
+		// 	.labelResolution(10)
+		// 	.labelAltitude(.03)
+		// 	.globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+		// 	.bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png');
 
 
 		// Auto-rotate
@@ -133,25 +156,60 @@
 		world.controls().enableZoom = false;
 
 
-		const url = "https://livesubs.ornith.cornell.edu";
+		const url = "http://localhost:4000";
 		const socket = io.connect(url, {
 			transports: ["websocket"]
 		});
+		socket.on('connect_error', e => {
+			console.log('eeror')
+			console.log(e);
+		})
+		socket.on('connect', () => {
+			console.log('connected to the socket server')
+		})
 
-		socket.on("numSubs", function (e) {
-		}),
-			socket.on("newsubs", function (e) {
-				data.features = JSON.parse(e).map((mapdata) => (
-					{
-						...feature, "properties": {
-							...feature.properties,
-							"latitude": mapdata.lat,
-							"longitude": mapdata.lng,
-						}
+
+		socket.on("new-data", function (e) {
+			const { newData, oldData } = e;
+			console.log('new ')
+
+			let features = newData.map((mapdata) => (
+				{
+					...feature, "properties": {
+						...feature.properties,
+						"latitude": mapdata.lat,
+						"longitude": mapdata.lng,
+
+					},
+					new: true,
+				}
+			))
+			features = [...features, ...oldData.map((mapdata) => (
+				{
+					...feature, "properties": {
+						...feature.properties,
+						"latitude": mapdata.lat,
+						"longitude": mapdata.lng,
 					}
-				))
-				world.labelsData(data.features);
-			})
+				}
+			))]
+
+			world.labelsData(features);
+		})
+		socket.on("historic-data", function (e) {
+			console.log('old Data')
+
+			const features = e.map((mapdata) => (
+				{
+					...feature, "properties": {
+						...feature.properties,
+						"latitude": mapdata.lat,
+						"longitude": mapdata.lng,
+					}
+				}
+			))
+			world.labelsData(features);
+		})
 
 
 	</script>
