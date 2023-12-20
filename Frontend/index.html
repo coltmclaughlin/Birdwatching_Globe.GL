@@ -1,152 +1,158 @@
 <head>
-<style>
-body {
-    margin: 0;
-    background-image: url("space-bkg.jpg");
-    background-size: cover;
-    background-position: center;
-	}
-.interface {
-position: absolute;
-width: 25%;
-height: 30%;
-bottom: 0px;
-right: 1%;
-z-index: 100;
-pointer-events: none;
-}
-#globeViz {
-    position: absolute;
-    z-index: 0;
-}
-.cover-1 {
-    position: absolute;
-    width: 100%;
-    height: 70%;
-    top: 0px;
-    left: 0px;
-    z-index: 100;
-}
-.cover-2 {
-    position: absolute;
-    width: 73.25%;
-    height: 30%;
-    bottom: 0px;
-    left: 0px;
-    z-index: 100;
-}
-</style>
-<script src="https://unpkg.com/three"></script> 
-<script src="globe.js"></script> 
-<script src="stars.js"></script> 
-<!--<script src="../../dist/globe.gl.js"></script>--> 
-<script src="https://livesubs.ornith.cornell.edu/socket.io/socket.io.js"></script> 
-<script src="https://livesubs.ornith.cornell.edu/socket.io/socket.io.js"></script>
+	<style>
+		body {
+			margin: 0;
+			background-image: url("space-bkg.jpg");
+			background-size: cover;
+			background-position: center;
+		}
+
+		.interface {
+			position: absolute;
+			width: 25%;
+			height: 30%;
+			bottom: 0px;
+			right: 1%;
+			z-index: 100;
+			pointer-events: none;
+		}
+
+		#globeViz {
+			position: absolute;
+			z-index: 0;
+		}
+
+		.cover-1 {
+			position: absolute;
+			width: 100%;
+			height: 70%;
+			top: 0px;
+			left: 0px;
+			z-index: 100;
+		}
+
+		.cover-2 {
+			position: absolute;
+			width: 73.25%;
+			height: 30%;
+			bottom: 0px;
+			left: 0px;
+			z-index: 100;
+		}
+	</style>
+	<script src="https://unpkg.com/three"></script>
+	<script src="globe.js"></script>
+	<script src="stars.js"></script>
+	<!--<script src="../../dist/globe.gl.js"></script>-->
+	<script src="https://livesubs.ornith.cornell.edu/socket.io/socket.io.js"></script>
+	<script src="https://livesubs.ornith.cornell.edu/socket.io/socket.io.js"></script>
 </head>
 
 <body>
-<div class="cover-1"></div>
-<div class="cover-2"></div>
-<div class="interface"><img src="globe-interface.png" width="100%" height="auto" alt=""/></div>
-<div id="globeViz"></div>
-<script>
-const feature = {
-	"type": "Feature",
-	"properties": {
-		"scalerank": 0,
-		"natscale": 600,
-		"labelrank": 2,
-		"featurecla": "",
-		"name": "",
-		"namepar": "",
-		"namealt": null,
-		"diffascii": 0,
-		"nameascii": "",
-		"adm0cap": 1,
-		"capalt": null,
-		"capin": null,
-		"worldcity": 1,
-		"megacity": 1,
-		"sov0name": "",
-		"sov_a3": "",
-		"adm0name": "",
-		"adm0_a3": "",
-		"adm1name": "",
-		"iso_a2": "",
-		"note": null,
-		"latitude": 0,
-		"longitude": 0,
-		"changed": 0,
-		"namediff": 0,
-		"diffnote": null,
-		"pop_max": 10452000,
-		"pop_min": 10452000,
-		"pop_other": 10585385,
-		"rank_max": 14,
-		"rank_min": 14,
-		"geonameid": 524901,
-		"meganame": "",
-		"ls_name": "",
-		"ls_match": 1,
-		"checkme": 0,
-		"min_zoom": 1.7,		
-	},
-	"bbox": [37.613577, 55.75411, 37.613577, 55.75411],
-	"geometry": { "type": "Point", "coordinates": [37.613577, 55.75411] }
-}
+	<div class="cover-1"></div>
+	<div class="cover-2"></div>
+	<div class="interface"><img src="globe-interface.png" width="100%" height="auto" alt="" /></div>
+	<div id="globeViz"></div>
+	<script>
+		const feature = {
+			"type": "Feature",
+			"properties": {
+				"scalerank": 0,
+				"natscale": 600,
+				"labelrank": 2,
+				"featurecla": "",
+				"name": "",
+				"namepar": "",
+				"namealt": null,
+				"diffascii": 0,
+				"nameascii": "",
+				"adm0cap": 1,
+				"capalt": null,
+				"capin": null,
+				"worldcity": 1,
+				"megacity": 1,
+				"sov0name": "",
+				"sov_a3": "",
+				"adm0name": "",
+				"adm0_a3": "",
+				"adm1name": "",
+				"iso_a2": "",
+				"note": null,
+				"latitude": 0,
+				"longitude": 0,
+				"changed": 0,
+				"namediff": 0,
+				"diffnote": null,
+				"pop_max": 10452000,
+				"pop_min": 10452000,
+				"pop_other": 10585385,
+				"rank_max": 14,
+				"rank_min": 14,
+				"geonameid": 524901,
+				"meganame": "",
+				"ls_name": "",
+				"ls_match": 1,
+				"checkme": 0,
+				"min_zoom": 1.7,
+			},
+			"bbox": [37.613577, 55.75411, 37.613577, 55.75411],
+			"geometry": { "type": "Point", "coordinates": [37.613577, 55.75411] }
+		}
 
-const data = {
-	type: 'FeatureCollection',
-	features: [],
-	"bbox": [
-		-175.220564477617, -41.2999878536917, 179.216647094029, 64.1500236197392
-	],
-}
-	  
-    const world = Globe({ animateIn: false })	
-	
-	
-	
-	      (document.getElementById('globeViz'))
+		const data = {
+			type: 'FeatureCollection',
+			features: [],
+			"bbox": [
+				-175.220564477617, -41.2999878536917, 179.216647094029, 64.1500236197392
+			],
+		}
 
-	
-	.labelsData(data.features)
-	.labelLat(d => d.properties.latitude)
-	.labelLng(d => d.properties.longitude)
-	.labelText(d => d.properties.name)
-	.labelSize(d => Math.sqrt(d.properties.pop_max) * 4e-4)
-	.labelDotRadius(d => Math.sqrt(d.properties.pop_max) * 4e-4)
-	.labelColor(() => 'rgba(255, 255, 0, 0.75)')
-	.labelResolution(10)
-	.labelAltitude(.03)
-    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-    .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png');
-	  
+		const world = Globe({ animateIn: false })
 
-    // Auto-rotate
-    world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.5;
-    world.controls().enableZoom = false;
 
- 
-	  	const url = "https://livesubs.ornith.cornell.edu";
-const socket = io.connect(url, {
-	transports: ["websocket"]
-});
 
-socket.on("numSubs", function(e) {
-}),
-socket.on("newsubs", function(e) {
-	data.features = JSON.parse(e).map((mapdata) => (
-		{...feature, "properties" : {
-			...feature.properties,
-			"latitude": mapdata.lat,
-			"longitude": mapdata.lng,
-		}}
-	))
-	world.labelsData(data.features);
-})
+			(document.getElementById('globeViz'))
 
-	  	
-  </script>
+
+			.labelsData(data.features)
+			.labelLat(d => d.properties.latitude)
+			.labelLng(d => d.properties.longitude)
+			.labelText(d => d.properties.name)
+			.labelSize(d => Math.sqrt(d.properties.pop_max) * 4e-4)
+			.labelDotRadius(d => Math.sqrt(d.properties.pop_max) * 4e-4)
+			.labelColor(() => 'rgba(255, 255, 0, 0.75)')
+			.labelResolution(10)
+			.labelAltitude(.03)
+			.globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+			.bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png');
+
+
+		// Auto-rotate
+		world.controls().autoRotate = true;
+		world.controls().autoRotateSpeed = 0.5;
+		world.controls().enableZoom = false;
+
+
+		const url = "https://livesubs.ornith.cornell.edu";
+		const socket = io.connect(url, {
+			transports: ["websocket"]
+		});
+
+		socket.on("numSubs", function (e) {
+		}),
+			socket.on("newsubs", function (e) {
+				data.features = JSON.parse(e).map((mapdata) => (
+					{
+						...feature, "properties": {
+							...feature.properties,
+							"latitude": mapdata.lat,
+							"longitude": mapdata.lng,
+						}
+					}
+				))
+				world.labelsData(data.features);
+			})
+
+
+	</script>
 </body>
