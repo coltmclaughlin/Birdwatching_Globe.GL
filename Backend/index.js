@@ -1,6 +1,8 @@
 import express from "express";
 import http from "http";
+import path from "path";
 import socketIO from "socket.io";
+import moment from "moment-timezone";
 // const socketIO = require("socket.io");
 // const { Server } = require("socket.io");
 import ioClient from "socket.io-client";
@@ -9,6 +11,10 @@ const sqlite3 = sqlite.verbose();
 
 // Setup express server and socket.io for backend server
 const app = express();
+app.use(express.static(path.resolve("../Frontend")));
+// app.get("/", (req, res) => {
+//   res.sendFile(path.resolve("../Frontend/index.html"));
+// });
 const server = http.createServer(app);
 const io = new socketIO(server);
 
@@ -57,11 +63,13 @@ socket.on("connect", () => {
 socket.on("newsubs", async (e) => {
   const data = JSON.parse(e);
   // Store new data in SQLite
+  const now = moment();
+  const tenMinutesBefore = now.subtract(24, "hours");
+  const formattedDateTime = tenMinutesBefore
+    .tz("UTC")
+    .format("YYYY-MM-DD HH:mm:ss");
 
-  const oneDayAgo = new Date(
-    new Date().getTime() - 24 * 3600 * 1000
-  ).toISOString();
-  const oldData = await getHistoricData(db, oneDayAgo);
+  const oldData = await getHistoricData(db, formattedDateTime);
   (data || []).map((el) => {
     const stmt = db.prepare(
       "INSERT INTO data_points (subNum, lat, lng, seconds, howMany, obsCount) VALUES (?, ?, ?, ?, ?, ?)"
@@ -79,26 +87,35 @@ socket.on("newsubs", async (e) => {
 // Serve last hour's data to new subscribers
 io.on("connection", async (socket) => {
   console.log("New client connected");
-  const oneHourAgo = new Date(
-    new Date().getTime() - 24 * 3600 * 1000
-  ).toISOString();
-  const data = await getHistoricData(db, oneHourAgo);
+  const now = moment();
+  const tenMinutesBefore = now.subtract(24, "hours");
+  const formattedDateTime = tenMinutesBefore
+    .tz("UTC")
+    .format("YYYY-MM-DD HH:mm:ss");
+
+  const data = await getHistoricData(db, formattedDateTime);
   socket.emit("historic-data", data);
 });
 
 // Clean up data older than one hour every 10 minutes
 setInterval(() => {
-  const oneDayAgo = new Date(
-    new Date().getTime() - 24 * 3600 * 1000
-  ).toISOString();
-  db.run("DELETE FROM data_points WHERE createTime < ?", oneDayAgo, (err) => {
-    if (err) {
-      console.error(err.message);
-    } else {
-      console.log("Deleted data points older than one hour");
+  const now = moment();
+  const tenMinutesBefore = now.subtract(24, "hours");
+  const formattedDateTime = tenMinutesBefore
+    .tz("UTC")
+    .format("YYYY-MM-DD HH:mm:ss");
+  db.run(
+    "DELETE FROM data_points WHERE createTime < ?",
+    formattedDateTime,
+    (err) => {
+      if (err) {
+        console.error(err.message);
+      } else {
+        console.log("Deleted data points older than 24 hours.");
+      }
     }
-  });
-}, 10 * 60000);
+  );
+}, 10000);
 
 // Start the express server listening on a specific port
 const PORT = 4000;

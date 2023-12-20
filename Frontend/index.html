@@ -156,8 +156,8 @@
 		world.controls().enableZoom = false;
 
 
-		const url = "http://localhost:4000";
-		const socket = io.connect(url, {
+
+		const socket = io.connect('/', {
 			transports: ["websocket"]
 		});
 		socket.on('connect_error', e => {
