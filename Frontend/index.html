@@ -98,7 +98,11 @@
 			"bbox": [37.613577, 55.75411, 37.613577, 55.75411],
 			"geometry": { "type": "Point", "coordinates": [37.613577, 55.75411] }
 		}
-
+		const setColor = (e) => {
+			if (e >= 17) return 'rgba(69, 121, 153, 0.5)';
+			else if (e >= 9) return 'rgba(201, 226, 49, 0.5)';
+			else return 'rgba(255, 188, 16, 0.5)';
+		}
 		const data = {
 			type: 'FeatureCollection',
 			features: [],
@@ -106,13 +110,7 @@
 				-175.220564477617, -41.2999878536917, 179.216647094029, 64.1500236197392
 			],
 		}
-		const newData = {
-			type: 'FeatureCollection',
-			features: [],
-			"bbox": [
-				-175.220564477617, -41.2999878536917, 179.216647094029, 64.1500236197392
-			],
-		}
+
 
 		const world = Globe({ animateIn: false })
 
@@ -125,9 +123,9 @@
 			.labelLat(d => d.properties.latitude)
 			.labelLng(d => d.properties.longitude)
 			.labelText(d => d.properties.name)
-			.labelSize(d => Math.sqrt(d.properties.pop_max) * 4e-4)
-			.labelDotRadius(d => d.new ? Math.sqrt(d.properties.pop_max) * 4e-4 : Math.sqrt(d.properties.pop_max) * 2e-4)
-			.labelColor((d) => d.new ? 'rgba(255, 255, 0, 0.75)' : 'rgba(255, 255, 255, 0.5)')
+			.labelSize(d => Math.sqrt(d.properties.pop_max) * 10e-4)
+			.labelDotRadius(d => d.new ? Math.sqrt(d.properties.pop_max) * 2e-4 : Math.sqrt(d.properties.pop_max) * 1e-4)
+			.labelColor((d) => d.new ? 'rgb(223, 30, 18)' : setColor(d.hours))
 			.labelResolution(10)
 			.labelAltitude(.03)
 			.globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
@@ -153,7 +151,7 @@
 		// Auto-rotate
 		world.controls().autoRotate = true;
 		world.controls().autoRotateSpeed = 0.5;
-		world.controls().enableZoom = false;
+		world.controls().enableZoom = true;
 
 
 
@@ -171,7 +169,7 @@
 
 		socket.on("new-data", function (e) {
 			const { newData, oldData } = e;
-			console.log('new ')
+			console.log('new')
 
 			let features = newData.map((mapdata) => (
 				{
@@ -182,6 +180,7 @@
 
 					},
 					new: true,
+					hours: mapdata.hours
 				}
 			))
 			features = [...features, ...oldData.map((mapdata) => (
@@ -190,7 +189,8 @@
 						...feature.properties,
 						"latitude": mapdata.lat,
 						"longitude": mapdata.lng,
-					}
+					},
+					hours: mapdata.hours
 				}
 			))]
 
@@ -205,7 +205,8 @@
 						...feature.properties,
 						"latitude": mapdata.lat,
 						"longitude": mapdata.lng,
-					}
+					},
+					hours: mapdata.hours
 				}
 			))
 			world.labelsData(features);

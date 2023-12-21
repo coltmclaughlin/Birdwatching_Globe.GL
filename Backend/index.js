@@ -37,7 +37,7 @@ const db = new sqlite3.Database(
 function getHistoricData(db, dateRange) {
   return new Promise((resolve, reject) => {
     db.all(
-      "SELECT * FROM data_points WHERE createTime >= ?",
+      "SELECT lat, lng, CAST((julianday('now') - julianday(createTime)) * 24 AS INTEGER) AS hours FROM data_points WHERE createTime >= ?",
       dateRange,
       (err, rows) => {
         if (err) {

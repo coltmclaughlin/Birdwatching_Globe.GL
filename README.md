@@ -16,3 +16,11 @@ We would need the final application no later than December 22, 2023.
 
 <h5 align="left">Here is a link to the current files for reference:</h5>
 https://twolefthands.com/clo-globe-V2-no-clouds.zip
+
+<h5 align="left">Steps to run this project:</h5>
+1. Install Node.js
+2. Open the command prompt (CMD), and execute the following commands:
+- cd Backend
+- npm install
+- npm start
+3. Open the browser and navigate to "http://<ip_address_or_domain>:4000"
