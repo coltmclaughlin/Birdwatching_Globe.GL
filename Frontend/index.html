@@ -98,11 +98,6 @@
 			"bbox": [37.613577, 55.75411, 37.613577, 55.75411],
 			"geometry": { "type": "Point", "coordinates": [37.613577, 55.75411] }
 		}
-		const setColor = (e) => {
-			if (e >= 17) return 'rgba(69, 121, 153, 0.5)';
-			else if (e >= 9) return 'rgba(201, 226, 49, 0.5)';
-			else return 'rgba(255, 188, 16, 0.5)';
-		}
 		const data = {
 			type: 'FeatureCollection',
 			features: [],
@@ -125,7 +120,7 @@
 			.labelText(d => d.properties.name)
 			.labelSize(d => Math.sqrt(d.properties.pop_max) * 10e-4)
 			.labelDotRadius(d => d.new ? Math.sqrt(d.properties.pop_max) * 2e-4 : Math.sqrt(d.properties.pop_max) * 1e-4)
-			.labelColor((d) => d.new ? 'rgb(223, 30, 18)' : setColor(d.hours))
+			.labelColor((d) => d.new ? 'rgb(223, 30, 18)' : d.hours >= 17 ? 'rgb(69, 121, 153)' : d.hours >= 9 ? 'rgb(201, 226, 49)' : 'rgb(255, 188, 16)')
 			.labelResolution(10)
 			.labelAltitude(.03)
 			.globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
